@@ -1,69 +1,80 @@
-interface User {
-  type: "user";
-  name: string;
-  age: number;
-  occupation: string;
+// 1. Define the TodoItem interface
+interface TodoItem {
+  id: number;
+  task: string;
+  completed: boolean;
+  dueDate: Date;
 }
 
-interface Admin {
-  type: "admin";
-  name: string;
-  age: number;
-  role: string;
+// 2. Implement the TodoList class
+class TodoList {
+  private todos: TodoItem[] = [];
+  private nextId: number = 1;
+
+  // Add a new todo item
+  addTodo(task: string, dueDate: Date): void {
+    const newTodo: TodoItem = {
+      id: this.nextId++,
+      task,
+      completed: false,
+      dueDate,
+    };
+    this.todos.push(newTodo);
+    console.log(`Added: "${task}"`);
+  }
+
+  // Mark a todo item as completed
+  completeTodo(id: number): void {
+    const todo = this.todos.find((todo) => todo.id === id);
+    if (todo) {
+      todo.completed = true;
+      console.log(`Completed: "${todo.task}"`);
+    } else {
+      console.log(`Todo with ID ${id} not found.`);
+    }
+  }
+
+  // Remove a todo item
+  removeTodo(id: number): void {
+    this.todos = this.todos.filter((todo) => todo.id !== id);
+    console.log(`Removed todo with ID ${id}`);
+  }
+
+  // List all todo items
+  listTodos(): TodoItem[] {
+    return this.todos;
+  }
+
+  // Filter todos by completed status
+  filterTodos(completed: boolean): TodoItem[] {
+    return this.todos.filter((todo) => todo.completed === completed);
+  }
+
+  // Update the task description of a todo item
+  updateTodo(id: number, newTask: string): void {
+    const todo = this.todos.find((todo) => todo.id === id);
+    if (todo) {
+      todo.task = newTask;
+      console.log(`Updated: "${newTask}"`);
+    } else {
+      console.log(`Todo with ID ${id} not found.`);
+    }
+  }
+
+  // Clear all completed todos
+  clearCompleted(): void {
+    this.todos = this.todos.filter((todo) => !todo.completed);
+    console.log("Cleared all completed todos.");
+  }
 }
 
-export type Person = User | Admin;
-
-export const persons: Person[] = [
-  {
-    type: "user",
-    name: "Max Mustermann",
-    age: 25,
-    occupation: "Chimney sweep",
-  },
-  { type: "admin", name: "Jane Doe", age: 32, role: "Administrator" },
-  { type: "user", name: "Kate Müller", age: 23, occupation: "Astronaut" },
-  { type: "admin", name: "Bruce Willis", age: 64, role: "World saver" },
-  { type: "user", name: "Wilson", age: 23, occupation: "Ball" },
-  { type: "admin", name: "Agent Smith", age: 23, role: "Anti-virus engineer" },
-];
-
-export function logPerson(person: Person) {
-  console.log(
-    ` - ${person.name}, ${person.age}, ${
-      person.type === "admin" ? person.role : person.occupation
-    }`
-  );
-}
-
-export function filterPersons<T extends "user" | "admin">(
-  persons: Person[],
-  personType: T,
-  criteria: T extends "user"
-    ? Partial<Omit<User, "type">>
-    : Partial<Omit<Admin, "type">>
-): T extends "user" ? User[] : Admin[] {
-  return persons
-    .filter((person) => person.type === personType)
-    .filter((person) => {
-      let criteriaKeys = Object.keys(criteria) as (keyof typeof criteria)[];
-      return criteriaKeys.every((fieldName) => {
-        return person[fieldName as keyof Person] === criteria[fieldName];
-      });
-    }) as any; // Explicitly cast return type
-}
-
-export const usersOfAge23 = filterPersons(persons, "user", { age: 23 });
-export const adminsOfAge23 = filterPersons(persons, "admin", { age: 23 });
-
-console.log("Users of age 23:");
-usersOfAge23.forEach(logPerson);
-
-console.log();
-
-console.log("Admins of age 23:");
-adminsOfAge23.forEach(logPerson);
-
-// use :
-// ---> ts-node app.ts
-// to run the code in the vs code terminal
+// Example usage
+const myTodos = new TodoList();
+myTodos.addTodo("Learn TypeScript", new Date("2024-03-10"));
+myTodos.addTodo("Build a project", new Date("2024-03-15"));
+console.log(myTodos.listTodos());
+myTodos.completeTodo(1);
+console.log(myTodos.filterTodos(true));
+myTodos.updateTodo(2, "Build an advanced TypeScript project");
+myTodos.clearCompleted();
+console.log(myTodos.listTodos());
