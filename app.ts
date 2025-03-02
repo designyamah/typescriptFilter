@@ -64,6 +64,9 @@ console.log();
 console.log("Admins of age 23:");
 adminsOfAge23.forEach(logPerson);
 
+const chidi: number = 90;
+const ada: number = 90;
+
 // use :
 // ---> ts-node app.ts
 // to run the code in the vs code terminal
